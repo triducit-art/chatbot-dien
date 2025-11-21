@@ -1,333 +1,459 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chatbot Tính Toán Mạch Điện</title>
-
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nhập liệu bằng chữ - Tính mạch điện nhiều nhánh</title>
+  <style>
     body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #f0f2f5;
     }
+
     .container {
-        width: 100%;
-        max-width: 980px;
-        margin: auto;
-        padding: 10px;
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 10px;
     }
+
+    h1 {
+      font-size: 20px;
+      text-align: center;
+      margin: 8px 0 10px 0;
+    }
+
     h2 {
-        text-align: center;
+      font-size: 16px;
+      margin: 6px 0;
     }
 
-    /* MOBILE FIRST */
-    .chat-box, .form-box {
-        width: 100%;
-        margin-bottom: 15px;
-        background: white;
-        border-radius: 10px;
-        padding: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .card {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
     }
 
-    .chat-window {
-        height: 250px;
-        overflow-y: auto;
-        background: #f8f9fa;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-    }
-    .msg {
-        margin: 8px 0;
-        padding: 8px 10px;
-        border-radius: 8px;
-        width: fit-content;
-        max-width: 80%;
-    }
-    .bot {
-        background: #ffffff;
-        border-left: 4px solid #4a67ff;
-    }
-    .user {
-        background: #4a67ff;
-        color: #ffffff;
-        margin-left: auto;
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
 
-    input, select {
-        width: 100%;
-        padding: 8px;
-        margin-top: 4px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
+    textarea:focus,
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
     }
 
     button {
-        width: 100%;
-        padding: 10px;
-        border: none;
-        background: #4a67ff;
-        color: white;
-        border-radius: 6px;
-        margin-top: 5px;
-        font-size: 16px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 2px;
+      margin-bottom: 6px;
+    }
+
+    button.secondary {
+      background: #16a34a;
+    }
+
+    button.small {
+      width: auto;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      margin-top: 4px;
+    }
+
+    button.danger {
+      background: #ef4444;
+    }
+
+    button.gray {
+      background: #6b7280;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: -6px;
+      margin-bottom: 6px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .branch-item {
-        padding: 10px;
-        background: #eef1ff;
-        border-radius: 8px;
-        margin-bottom: 6px;
+      padding: 8px 10px;
+      background: #eef2ff;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 6px;
     }
 
     .result-box {
-        background: #d9ecff;
-        padding: 12px;
-        border-radius: 10px;
-        margin-top: 10px;
+      background: #dbeafe;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-top: 6px;
     }
-</style>
+
+    @media (min-width: 900px) {
+      .field-row-3 {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 8px;
+      }
+    }
+  </style>
 </head>
-<div style="
-    margin-top: 20px;
-    text-align: center;
-    font-size: 14px;
-    opacity: 0.3;
-">
-    Design by: <b>Johnny Đức</b>
-</div>
 
 <body>
-<div class="container">
+  <div class="container">
+    <h1>🔌 Nhập liệu bằng chữ – Tính mạch điện nhiều nhánh</h1>
 
-    <h2>🔌 Chatbot AI – Tính toán mạch điện nhiều nhánh</h2>
-
-    <!-- CHATBOT -->
-    <div class="chat-box">
-        <h3>💬 Chatbot</h3>
-        <div id="chatWindow" class="chat-window"></div>
-
-        <input id="chatInput" placeholder="Nhập câu hỏi...">
-        <button onclick="sendChat()">Gửi</button>
+    <!-- Ô NHẬP LIỆU BẰNG CHỮ -->
+    <div class="card">
+      <h2>1. Nhập mô tả nhánh mạch bằng chữ</h2>
+      <textarea id="nlInput" rows="3"
+        placeholder="Ví dụ:
+&#10;• ổ cắm phòng khách 1200W cos 1 tải không động cơ dây đồng
+&#10;• điều hòa phòng ngủ 1800w cos 0.8 có động cơ dây nhôm"></textarea>
+      <div class="hint">
+        Chương trình sẽ cố gắng nhận dạng:
+        <b>tên nhánh, P (W), cosφ, loại tải, vật liệu dây</b> rồi tự điền xuống
+        bảng “Thông số nhánh” và <b>tự động thêm nhánh luôn</b> nếu đủ dữ liệu.
+      </div>
+      <button onclick="parseNaturalText()">
+        ✏️ Phân tích & tự động thêm nhánh
+      </button>
+      <div id="nlStatus" class="hint" style="margin-top:6px;"></div>
     </div>
 
-    <!-- FORM TÍNH NHIỀU NHÁNH -->
-    <div class="form-box">
-        <h3>⚡ Thêm nhánh mạch</h3>
+    <!-- FORM THÔNG SỐ NHÁNH -->
+    <div class="card">
+      <h2>2. Thông số nhánh (nếu cần chỉnh tay)</h2>
 
-        <label>Tên nhánh</label>
-        <input id="b_name" placeholder="VD: Ổ cắm phòng khách">
+      <label>Tên nhánh</label>
+      <input id="b_name" placeholder="VD: Ổ cắm phòng khách" />
 
-        <label>Công suất P (W)</label>
-        <input type="number" id="b_power" placeholder="VD: 1200">
-
-        <label>Hệ số công suất cosφ</label>
-        <input type="number" id="b_cos" placeholder="1.0 hoặc 0.8">
-
-        <label>Loại tải</label>
-        <select id="b_load">
-            <option value="no-motor">Không động cơ</option>
-            <option value="motor">Có động cơ</option>
-        </select>
-
-        <label>Vật liệu dây</label>
-        <select id="b_mat">
+      <div class="field-row-3">
+        <div>
+          <label>Công suất P (W)</label>
+          <input type="number" id="b_power" placeholder="VD: 1200" />
+        </div>
+        <div>
+          <label>Hệ số công suất cosφ</label>
+          <input type="number" id="b_cos" placeholder="VD: 1 hoặc 0.8" />
+        </div>
+        <div>
+          <label>Vật liệu dây</label>
+          <select id="b_mat">
             <option value="cu">Dây đồng</option>
             <option value="al">Dây nhôm</option>
-        </select>
+          </select>
+        </div>
+      </div>
 
-        <button onclick="addBranch()">➕ Thêm nhánh</button>
+      <div class="field-row">
+        <div>
+          <label>Loại tải</label>
+          <select id="b_load">
+            <option value="no-motor">Không động cơ</option>
+            <option value="motor">Có động cơ (máy nén, bơm, điều hòa...)</option>
+          </select>
+        </div>
+        <div>
+          <label>Điện áp U (V)</label>
+          <input type="number" id="b_voltage" value="220" />
+        </div>
+      </div>
 
-        <h3>📋 Danh sách nhánh</h3>
-        <div id="branchList"></div>
-
-        <button style="background:#28a745" onclick="calcAll()">🧮 Tính tất cả nhánh & mạch tổng</button>
-
-        <div id="result" class="result-box" style="display:none"></div>
+      <button class="secondary" onclick="addBranch()">➕ Thêm nhánh (thủ công)</button>
+      <div class="hint">
+        Thông thường bạn chỉ cần dùng nút “Phân tích & tự động thêm nhánh”. Nút “Thêm nhánh” này để nhập tay hoặc chỉnh sửa rồi thêm.
+      </div>
     </div>
 
-</div>
+    <!-- DANH SÁCH NHÁNH -->
+    <div class="card">
+      <h2>3. Danh sách nhánh</h2>
+      <div id="branchList" class="hint">
+        Chưa có nhánh nào. Hãy nhập mô tả bằng chữ ở bước 1.
+      </div>
 
-<script>
-let branches = [];
+      <button onclick="calcAll()">🧮 Tính dòng điện, dây & aptomat cho tất cả nhánh + mạch tổng</button>
+      <button class="gray" onclick="resetBranches()">🔄 Xoá tất cả nhánh</button>
 
-function chatBotSay(text){
-    let box = document.getElementById("chatWindow");
-    let msg = document.createElement("div");
-    msg.className = "msg bot";
-    msg.innerHTML = text.replace(/\n/g,"<br>");
-    box.appendChild(msg);
-    box.scrollTop = box.scrollHeight;
-}
+      <div id="result" class="result-box" style="display: none"></div>
+    </div>
+  </div>
 
-function userSay(text){
-    let box = document.getElementById("chatWindow");
-    let msg = document.createElement("div");
-    msg.className = "msg user";
-    msg.innerText = text;
-    box.appendChild(msg);
-    box.scrollTop = box.scrollHeight;
-}
+  <script>
+    let branches = [];
 
-chatBotSay("Xin chào! Tôi là trợ lý tính toán mạch điện. Bạn có thể nhập câu hỏi hoặc thêm các nhánh mạch bên dưới.");
-
-async function sendChat(){
-    let text = document.getElementById("chatInput").value.trim();
-    if(!text) return;
-
-    userSay(text);
-    document.getElementById("chatInput").value = "";
-
-    chatBotSay("⏳ Đang xử lý...");
-
-    try {
-        let response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer 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"
-            },
-            body: JSON.stringify({
-                model: "gpt-5.1",
-                messages: [
-                    { role: "system", content: "Bạn là trợ lý chuyên về kỹ thuật điện dân dụng." },
-                    { role: "user", content: text }
-                ]
-            })
-        });
-
-        let data = await response.json();
-
-        let reply = data.choices?.[0]?.message?.content || "Xin lỗi, tôi không thể trả lời lúc này.";
-
-        chatBotSay(reply);
-
-    } catch (e) {
-        chatBotSay("⚠️ Lỗi kết nối tới ChatGPT API.");
+    function showStatus(text) {
+      document.getElementById("nlStatus").innerText = text;
     }
-}
 
-
-
-function addBranch(){
-    let n = document.getElementById("b_name").value.trim();
-    let p = parseFloat(document.getElementById("b_power").value);
-    let c = parseFloat(document.getElementById("b_cos").value);
-    let load = document.getElementById("b_load").value;
-    let mat = document.getElementById("b_mat").value;
-
-    if(!n || !p || !c){
-        alert("Bạn phải nhập đủ: tên nhánh, công suất, cosφ");
+    // Phân tích câu chữ -> điền form + tự động thêm nhánh nếu đủ dữ liệu
+    function parseNaturalText() {
+      const raw = document.getElementById("nlInput").value.trim();
+      if (!raw) {
+        showStatus("⚠️ Bạn chưa nhập nội dung mô tả.");
         return;
+      }
+
+      let text = raw.toLowerCase();
+
+      // 1. Tìm công suất (W hoặc kW)
+      let power = null;
+      let powerMatch = text.match(/(\d+(?:[.,]\d+)?)\s*(kw|kW|kwatt|kWatt|w|watt)/i);
+      if (powerMatch) {
+        let value = parseFloat(powerMatch[1].replace(",", "."));
+        let unit = powerMatch[2].toLowerCase();
+        if (unit.startsWith("k")) {
+          value = value * 1000;
+        }
+        power = value;
+      }
+
+      // 2. Tìm cosφ
+      let cosphi = null;
+      let cosMatch = text.match(/cosφ?|cos\s*=?\s*(\d+(?:[.,]\d+)?)/i);
+      if (cosMatch) {
+        cosphi = parseFloat(cosMatch[1].replace(",", "."));
+      }
+
+      // 3. Loại tải
+      let load = "no-motor";
+      if (
+        text.includes("động cơ") ||
+        text.includes("máy bơm") ||
+        text.includes("bơm nước") ||
+        text.includes("điều hòa") ||
+        text.includes("điều hoà") ||
+        text.includes("compressor")
+      ) {
+        load = "motor";
+      }
+
+      // 4. Vật liệu dây
+      let mat = "cu";
+      if (text.includes("nhôm")) {
+        mat = "al";
+      } else if (text.includes("đồng")) {
+        mat = "cu";
+      }
+
+      // 5. Tên nhánh: lấy phần trước giá trị công suất đầu tiên
+      let name = "";
+      if (powerMatch) {
+        let idx = text.indexOf(powerMatch[0].toLowerCase());
+        name = raw.slice(0, idx).trim();
+      }
+      if (!name) {
+        name = "Nhánh " + (branches.length + 1);
+      }
+
+      // Điền form (cho người dùng thấy đã phân tích ra gì)
+      document.getElementById("b_name").value = name;
+      if (power) document.getElementById("b_power").value = power.toFixed(0);
+      if (cosphi) document.getElementById("b_cos").value = cosphi;
+      document.getElementById("b_load").value = load;
+      document.getElementById("b_mat").value = mat;
+
+      // Auto-add nếu đủ name, P, cos
+      if (name && power && cosphi) {
+        addBranch(true); // tự động thêm nhánh
+        showStatus(
+          "✅ Đã phân tích & tự động thêm nhánh: \"" +
+            name +
+            "\" (P=" +
+            power.toFixed(0) +
+            " W, cosφ=" +
+            cosphi +
+            "). Nếu cần chỉnh sửa, bạn có thể sửa form rồi bấm “Thêm nhánh (thủ công)”."
+        );
+      } else {
+        showStatus(
+          "⚠️ Đã phân tích một phần. Hệ thống không đủ dữ liệu để tự thêm nhánh. Vui lòng kiểm tra lại form và bấm “Thêm nhánh (thủ công)”."
+        );
+      }
     }
 
-    branches.push({name:n, P:p, cos:c, load:load, mat:mat});
+    // Thêm nhánh từ form; auto=true: gọi từ parseNaturalText (không alert to)
+    function addBranch(auto = false) {
+      let n = document.getElementById("b_name").value.trim();
+      let p = parseFloat(document.getElementById("b_power").value);
+      let c = parseFloat(document.getElementById("b_cos").value);
+      let mat = document.getElementById("b_mat").value;
+      let load = document.getElementById("b_load").value;
+      let U = parseFloat(document.getElementById("b_voltage").value) || 220;
 
-    renderList();
-}
+      if (!n || !p || !c) {
+        if (!auto) {
+          alert("Cần có đủ TÊN NHÁNH, P (W) và cosφ.");
+        }
+        return;
+      }
 
-function renderList(){
-    let box = document.getElementById("branchList");
-    box.innerHTML = "";
+      branches.push({
+        name: n,
+        P: p,
+        cos: c,
+        mat: mat,
+        load: load,
+        U: U,
+      });
 
-    branches.forEach((b,i)=>{
-        let item = document.createElement("div");
+      renderList();
+
+      if (!auto) {
+        showStatus("✅ Đã thêm nhánh \"" + n + "\" từ form thủ công.");
+      }
+    }
+
+    function renderList() {
+      const box = document.getElementById("branchList");
+      if (branches.length === 0) {
+        box.innerHTML =
+          '<span class="hint">Chưa có nhánh nào. Hãy nhập mô tả và thêm nhánh.</span>';
+        return;
+      }
+
+      box.innerHTML = "";
+      branches.forEach((b, i) => {
+        const item = document.createElement("div");
         item.className = "branch-item";
-        item.innerHTML = `
-            <b>${b.name}</b><br>
-            P=${b.P}W | cosφ=${b.cos} | ${b.load=="motor"?"Có động cơ":"Không động cơ"} |
-            ${b.mat=="cu"?"Dây đồng":"Nhôm"}
-            <br>
-            <button onclick="delBranch(${i})" style="width:auto; padding:4px 8px; margin-top:4px">Xóa</button>
-        `;
+        item.innerHTML =
+          `<b>${b.name}</b><br>` +
+          `P = ${b.P} W, cosφ = ${b.cos}, U = ${b.U} V<br>` +
+          `${b.load === "motor" ? "Tải có động cơ" : "Tải không động cơ"} – ` +
+          `${b.mat === "cu" ? "Dây đồng" : "Dây nhôm"}<br>` +
+          `<button class="small danger" onclick="delBranch(${i})">Xoá nhánh</button>`;
         box.appendChild(item);
-    });
-}
-
-function delBranch(i){
-    branches.splice(i,1);
-    renderList();
-}
-
-function calcAll(){
-    if(branches.length === 0){
-        alert("Bạn chưa thêm nhánh nào!");
-        return;
+      });
     }
 
-    let resultHTML = "<h3>📌 KẾT QUẢ TỪNG NHÁNH</h3>";
+    function delBranch(i) {
+      branches.splice(i, 1);
+      renderList();
+    }
 
-    let totalP = 0;
-    let totalI = 0;
+    function resetBranches() {
+      if (!confirm("Bạn có chắc muốn xoá TẤT CẢ các nhánh đã nhập?")) return;
+      branches = [];
+      renderList();
+      const box = document.getElementById("result");
+      box.style.display = "none";
+      box.innerHTML = "";
+      showStatus("🔄 Đã xoá toàn bộ danh sách nhánh.");
+    }
 
-    branches.forEach(b=>{
-        let U = 220;
-        let cos = b.cos;
-        let I = b.P / (U*cos);
-        let J = (b.mat=="cu") ? 6 : 4;
-        let S = I / J;
+    function calcAll() {
+      if (branches.length === 0) {
+        alert("Bạn chưa thêm nhánh nào.");
+        return;
+      }
 
-        let Sstd = chooseStd(S);
+      let html = "<h3>📌 Kết quả từng nhánh</h3>";
+      let totalP = 0;
+      let totalI = 0;
 
-        let hat = (b.load=="motor")?2.0:1.25;
-        let Idm = I*hat;
-        let MCB = chooseMCB(Idm);
+      branches.forEach((b) => {
+        const U = b.U || 220;
+        const cos = b.cos || 1;
+        const I = b.P / (U * cos);
 
-        resultHTML += `
-            <div style="margin-bottom:10px">
-                <b>${b.name}</b><br>
-                P=${b.P}W • cosφ=${cos} → <b>I=${I.toFixed(2)}A</b><br>
-                S yêu cầu = ${(S).toFixed(2)}mm² → chọn <b>${Sstd}mm²</b><br>
-                Aptomat nhánh → <b>${MCB}A</b>
-            </div>
-        `;
+        // Mật độ dòng J tham khảo: đồng 6 A/mm², nhôm 4 A/mm²
+        const J = b.mat === "cu" ? 6 : 4;
+        const S = I / J;
+        const Sstd = chooseStd(S);
+
+        // Hệ số an toàn aptomat
+        const hat = b.load === "motor" ? 2.0 : 1.25;
+        const Idm = I * hat;
+        const MCB = chooseMCB(Idm);
+
+        html +=
+          `<div style="margin-bottom:8px;">` +
+          `<b>${b.name}</b><br>` +
+          `P = ${b.P} W, cosφ = ${cos}, U = ${U} V → <b>I ≈ ${I.toFixed(
+            2
+          )} A</b><br>` +
+          `Tiết diện yêu cầu S = I / J ≈ ${S.toFixed(
+            2
+          )} mm² → chọn dây <b>${Sstd} mm²</b><br>` +
+          `Aptomat nhánh: I<sub>đm</sub> = I·h<sub>at</sub> ≈ ${Idm.toFixed(
+            2
+          )} A → chọn khoảng <b>${MCB} A</b>` +
+          `</div>`;
 
         totalP += b.P;
         totalI += I;
-    });
+      });
 
-    // mạch tổng
-    let U=220;
-    let Itong = totalI;
-    let S_tong = Itong / 6;
-    let Sstd_tong = chooseStd(S_tong);
+      // Mạch tổng (giả sử cùng điện áp 220V và dùng dây đồng tổng)
+      const J_tong = 6; // đồng
+      const S_tong = totalI / J_tong;
+      const Sstd_tong = chooseStd(S_tong);
+      const MCB_tong = chooseMCB(totalI * 1.25);
 
-    let MCB_tong = chooseMCB(Itong*1.25);
+      html +=
+        `<h3>🔰 Mạch tổng</h3>` +
+        `Tổng công suất: <b>${totalP.toFixed(0)} W</b><br>` +
+        `Tổng dòng: <b>${totalI.toFixed(2)} A</b><br>` +
+        `Dây tổng yêu cầu S ≈ ${S_tong.toFixed(
+          2
+        )} mm² → nên chọn dây khoảng <b>${Sstd_tong} mm²</b><br>` +
+        `Aptomat tổng đề xuất ≈ <b>${MCB_tong} A</b>`;
 
-    resultHTML += `
-        <h3>🔰 MẠCH TỔNG</h3>
-        Tổng công suất: <b>${totalP}W</b><br>
-        Tổng dòng: <b>${Itong.toFixed(2)}A</b><br>
-        Dây tổng yêu cầu = ${(S_tong).toFixed(2)}mm² → chọn <b>${Sstd_tong}mm²</b><br>
-        Aptomat tổng đề xuất → <b>${MCB_tong}A</b>
-    `;
-
-    let box = document.getElementById("result");
-    box.style.display="block";
-    box.innerHTML = resultHTML;
-
-    chatBotSay("Tôi đã tính xong. Kéo xuống dưới để xem kết quả chi tiết!");
-}
-
-function chooseStd(S){
-    let std = [0.5,0.75,1,1.5,2,2.5,4,6,10,16,25,35];
-    for(let x of std){
-        if(x>=S) return x;
+      const box = document.getElementById("result");
+      box.style.display = "block";
+      box.innerHTML = html;
     }
-    return std[std.length-1];
-}
 
-function chooseMCB(I){
-    let list=[6,10,16,20,25,32,40,50,63,80,100];
-    for(let x of list){
-        if(x>=I) return x;
+    function chooseStd(S) {
+      const std = [0.5, 0.75, 1, 1.5, 2, 2.5, 4, 6, 10, 16, 25, 35];
+      for (const x of std) {
+        if (x >= S) return x;
+      }
+      return std[std.length - 1];
     }
-    return list[list.length-1];
-}
 
-</script>
+    function chooseMCB(I) {
+      const list = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
+      for (const x of list) {
+        if (x >= I) return x;
+      }
+      return list[list.length - 1];
+    }
+  </script>
 </body>
 </html>
