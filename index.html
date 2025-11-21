@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chatbot Tính Toán Mạch Điện Nhiều Nhánh</title>
+<title>Chatbot Tính Toán Mạch Điện</title>
 
 <style>
     body {
@@ -91,6 +91,14 @@
     }
 </style>
 </head>
+<div style="
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.3;
+">
+    Design by: <b>Johnny Đức</b>
+</div>
 
 <body>
 <div class="container">
@@ -166,15 +174,42 @@ function userSay(text){
 
 chatBotSay("Xin chào! Tôi là trợ lý tính toán mạch điện. Bạn có thể nhập câu hỏi hoặc thêm các nhánh mạch bên dưới.");
 
-function sendChat(){
+async function sendChat(){
     let text = document.getElementById("chatInput").value.trim();
     if(!text) return;
 
     userSay(text);
     document.getElementById("chatInput").value = "";
 
-    chatBotSay("Tôi đã nhận câu hỏi. Để tính toán chính xác, hãy thêm nhánh mạch trong bảng bên dưới.");
+    chatBotSay("⏳ Đang xử lý...");
+
+    try {
+        let response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer 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"
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: "Bạn là trợ lý chuyên về kỹ thuật điện dân dụng." },
+                    { role: "user", content: text }
+                ]
+            })
+        });
+
+        let data = await response.json();
+
+        let reply = data.choices?.[0]?.message?.content || "Xin lỗi, tôi không thể trả lời lúc này.";
+
+        chatBotSay(reply);
+
+    } catch (e) {
+        chatBotSay("⚠️ Lỗi kết nối tới ChatGPT API.");
+    }
 }
+
 
 
 function addBranch(){
