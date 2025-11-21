@@ -19,10 +19,18 @@
       padding: 10px;
     }
 
+    .designer {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+
     h1 {
       font-size: 20px;
       text-align: center;
-      margin: 8px 0 10px 0;
+      margin: 4px 0 10px 0;
     }
 
     h2 {
@@ -130,34 +138,113 @@
         gap: 8px;
       }
     }
+
+    /* Ô nhập liệu lớn hơn */
+    #nlInput {
+      width: 100%;
+      min-height: 140px;
+      font-size: 16px;
+      padding: 12px;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    .nl-wrapper {
+      position: relative;
+    }
+
+    .nl-hint {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.45;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Popup gợi ý autocomplete */
+    .nl-suggestions {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 14px;
+      z-index: 20;
+      display: none;
+    }
+
+    .nl-suggestion-item {
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .nl-suggestion-item:hover {
+      background: #e5f0ff;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>🔌 Nhập liệu bằng chữ – Tính mạch điện nhiều nhánh</h1>
+    <div class="designer">Design by: Johnny Đức</div>
+    <h1>🔌 ChatBot - Tính toán thông số mạch điện gia đình</h1>
 
-    <!-- Ô NHẬP LIỆU BẰNG CHỮ -->
+    <!-- 1. Ô NHẬP LIỆU BẰNG CHỮ + GỢI Ý + AUTOCOMPLETE -->
     <div class="card">
       <h2>1. Nhập mô tả nhánh mạch bằng chữ</h2>
-      <textarea id="nlInput" rows="3"
-        placeholder="Ví dụ:
-&#10;• ổ cắm phòng khách 1200W cos 1 tải không động cơ dây đồng
-&#10;• điều hòa phòng ngủ 1800w cos 0.8 có động cơ dây nhôm"></textarea>
-      <div class="hint">
-        Chương trình sẽ cố gắng nhận dạng:
-        <b>tên nhánh, P (W), cosφ, loại tải, vật liệu dây</b> rồi tự điền xuống
-        bảng “Thông số nhánh” và <b>tự động thêm nhánh luôn</b> nếu đủ dữ liệu.
+
+      <div class="nl-wrapper">
+        <textarea
+          id="nlInput"
+          rows="5"
+          oninput="handleInputHintAndSuggest()"
+          onblur="hideSuggestions()"
+          placeholder=""
+        ></textarea>
+
+        <div id="nlHint" class="nl-hint">
+          Ví dụ:<br />
+          • quạt trần phòng khách 1200W<br />
+          • điều hòa phòng ngủ 1800W<br />
+          • bình nóng lạnh nhà tắm<br />      
+        </div>
+
+        <div id="nlSuggestions" class="nl-suggestions"></div>
       </div>
+
+      <div class="hint">
+        Quy ước tự động:<br />
+        - Nếu mô tả có các từ:
+        <b
+          >quạt trần, quạt đảo, quạt treo tường, máy bơm, động cơ, máy giặt, máy lạnh, điều hòa</b
+        >
+        ⇒ dùng <b>cosφ = 0,8</b> (tải có động cơ).<br />
+        - Các trường hợp khác ⇒ <b>cosφ = 1</b>.<br />
+        - Nếu không ghi đơn vị W/kW, số như <b>1200</b> sẽ được hiểu là
+        <b>1200 W</b>.<br />
+        - Nếu không ghi công suất mà chỉ ghi tên thiết bị (ví dụ "bình nóng
+        lạnh") ⇒ chương trình dùng công suất tham khảo.
+      </div>
+
       <button onclick="parseNaturalText()">
         ✏️ Phân tích & tự động thêm nhánh
       </button>
-      <div id="nlStatus" class="hint" style="margin-top:6px;"></div>
+      <div id="nlStatus" class="hint" style="margin-top: 6px"></div>
     </div>
 
-    <!-- FORM THÔNG SỐ NHÁNH -->
+    <!-- 2. FORM THÔNG SỐ NHÁNH -->
     <div class="card">
-      <h2>2. Thông số nhánh (nếu cần chỉnh tay)</h2>
+      <h2>2. Thông số nhánh</h2>
 
       <label>Tên nhánh</label>
       <input id="b_name" placeholder="VD: Ổ cắm phòng khách" />
@@ -168,24 +255,10 @@
           <input type="number" id="b_power" placeholder="VD: 1200" />
         </div>
         <div>
-          <label>Hệ số công suất cosφ</label>
-          <input type="number" id="b_cos" placeholder="VD: 1 hoặc 0.8" />
-        </div>
-        <div>
           <label>Vật liệu dây</label>
           <select id="b_mat">
             <option value="cu">Dây đồng</option>
             <option value="al">Dây nhôm</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div>
-          <label>Loại tải</label>
-          <select id="b_load">
-            <option value="no-motor">Không động cơ</option>
-            <option value="motor">Có động cơ (máy nén, bơm, điều hòa...)</option>
           </select>
         </div>
         <div>
@@ -194,20 +267,43 @@
         </div>
       </div>
 
-      <button class="secondary" onclick="addBranch()">➕ Thêm nhánh (thủ công)</button>
+      <div class="field-row">
+        <div>
+          <label>Loại tải </label>
+          <select id="b_load">
+            <option value="no-motor">Không động cơ</option>
+            <option value="motor">Có động cơ</option>
+          </select>
+        </div>
+        <div>
+          <label>cosφ (tự tính theo quy ước)</label>
+          <input
+            id="b_cos_display"
+            disabled
+            placeholder="Sẽ hiển thị 0.80 hoặc 1.00"
+          />
+        </div>
+      </div>
+
+      <button class="secondary" onclick="addBranch()">
+        ➕ Thêm nhánh (thủ công)
+      </button>
       <div class="hint">
-        Thông thường bạn chỉ cần dùng nút “Phân tích & tự động thêm nhánh”. Nút “Thêm nhánh” này để nhập tay hoặc chỉnh sửa rồi thêm.
+        Thường bạn chỉ cần bước 1. Bước 2 dùng khi muốn chỉnh tên, công suất…
+        rồi bấm “Thêm nhánh (thủ công)”.
       </div>
     </div>
 
-    <!-- DANH SÁCH NHÁNH -->
+    <!-- 3. DANH SÁCH NHÁNH + TÍNH TOÁN -->
     <div class="card">
       <h2>3. Danh sách nhánh</h2>
       <div id="branchList" class="hint">
         Chưa có nhánh nào. Hãy nhập mô tả bằng chữ ở bước 1.
       </div>
 
-      <button onclick="calcAll()">🧮 Tính dòng điện, dây & aptomat cho tất cả nhánh + mạch tổng</button>
+      <button onclick="calcAll()">
+        🧮 Tính dòng điện, tiết diện dây & aptomat cho tất cả nhánh + mạch tổng
+      </button>
       <button class="gray" onclick="resetBranches()">🔄 Xoá tất cả nhánh</button>
 
       <div id="result" class="result-box" style="display: none"></div>
@@ -217,11 +313,226 @@
   <script>
     let branches = [];
 
+    // Danh sách thiết bị phổ biến + công suất THAM KHẢO
+    const DEVICE_CATALOG = [
+      { keywords: ["bình nóng lạnh", "binh nong lanh"], power: 2500 },
+      { keywords: ["tủ lạnh", "tu lanh"], power: 150 },
+      { keywords: ["quạt trần", "quat tran"], power: 120 },
+      { keywords: ["quạt treo tường", "quat treo tuong"], power: 80 },
+      { keywords: ["quạt đảo", "quat dao"], power: 80 },
+      { keywords: ["quạt cây", "quat cay"], power: 75 },
+      { keywords: ["máy bơm", "may bom"], power: 750 },
+      { keywords: ["máy giặt", "may giat"], power: 500 },
+      { keywords: ["máy lạnh 1hp", "may lanh 1hp"], power: 750 },
+      {
+        keywords: ["máy lạnh", "may lanh", "điều hòa", "điều hoà", "dieu hoa"],
+        power: 3000,
+      },
+      { keywords: ["bóng đèn led", "bong den led"], power: 18 },
+      {
+        keywords: [
+          "đuôi đèn",
+          "bóng đèn",
+          "bong den",
+          "đèn huỳnh quang",
+          "den huynh quang",
+        ],
+        power: 40,
+      },
+      { keywords: ["tivi", "tv"], power: 100 },
+      { keywords: ["máy tính bàn", "may tinh ban"], power: 200 },
+      { keywords: ["máy tính", "may tinh", "laptop"], power: 90 },
+      { keywords: ["bếp điện", "bep dien"], power: 1500 },
+      { keywords: ["nồi cơm", "noi com"], power: 700 },
+      { keywords: ["ấm siêu tốc", "am sieu toc"], power: 1500 },
+    ];
+
+    // Gợi ý autocomplete
+    const SUGGESTION_TEMPLATES = [
+      "quạt trần phòng khách 1200W",
+      "quạt treo tường phòng ngủ 80W",
+      "quạt đảo phòng khách 100W",
+      "điều hòa phòng ngủ 1800W",
+      "điều hòa 9000 BTU",
+      "bình nóng lạnh nhà tắm",
+      "tủ lạnh 150W",
+      "ổ cắm tầng 1 1000W",
+      "dãy đèn led phòng khách 300W",
+      "bếp điện 1500W",
+      "máy giặt 500W",
+    ];
+
     function showStatus(text) {
       document.getElementById("nlStatus").innerText = text;
     }
 
-    // Phân tích câu chữ -> điền form + tự động thêm nhánh nếu đủ dữ liệu
+    // Hiển thị/ẩn hint + cập nhật gợi ý
+    function handleInputHintAndSuggest() {
+      const box = document.getElementById("nlInput");
+      const hint = document.getElementById("nlHint");
+
+      if (box.value.trim().length === 0) {
+        hint.style.display = "block";
+      } else {
+        hint.style.display = "none";
+      }
+
+      updateSuggestions();
+    }
+
+    function hideSuggestions() {
+      const sugBox = document.getElementById("nlSuggestions");
+      if (sugBox) {
+        sugBox.style.display = "none";
+        sugBox.innerHTML = "";
+      }
+    }
+
+    function updateSuggestions() {
+      const box = document.getElementById("nlInput");
+      const sugBox = document.getElementById("nlSuggestions");
+      const text = box.value.toLowerCase();
+
+      if (!text.trim()) {
+        hideSuggestions();
+        return;
+      }
+
+      const parts = text.split(/\s+/);
+      const lastWord = parts[parts.length - 1];
+
+      if (!lastWord || lastWord.length < 2) {
+        hideSuggestions();
+        return;
+      }
+
+      const matches = SUGGESTION_TEMPLATES.filter((s) =>
+        s.toLowerCase().includes(lastWord)
+      ).slice(0, 5);
+
+      if (matches.length === 0) {
+        hideSuggestions();
+        return;
+      }
+
+      sugBox.innerHTML = "";
+      matches.forEach((m) => {
+        const item = document.createElement("div");
+        item.className = "nl-suggestion-item";
+        item.textContent = m;
+        item.onclick = () => applySuggestion(m);
+        sugBox.appendChild(item);
+      });
+      sugBox.style.display = "block";
+    }
+
+    function applySuggestion(text) {
+      const box = document.getElementById("nlInput");
+      const current = box.value;
+      const trimmed = current.trim();
+
+      if (!trimmed) {
+        box.value = text;
+      } else {
+        const sep = /\s$/.test(current) ? "" : " ";
+        box.value = current + sep + text;
+      }
+
+      box.focus();
+      handleInputHintAndSuggest();
+    }
+
+    // Suy luận cosφ (0.8 cho nhóm motor, 1.0 cho còn lại) + loại tải
+    function inferCosAndLoadFromString(str) {
+      const s = (str || "").toLowerCase();
+
+      const keywordsMotorCos08 = [
+        "quạt trần",
+        "quat tran",
+        "quạt đảo",
+        "quat dao",
+        "quạt treo tường",
+        "quat treo tuong",
+        "máy bơm",
+        "may bom",
+        "động cơ",
+        "dong co",
+        "máy giặt",
+        "may giat",
+        "máy lạnh",
+        "may lanh",
+        "điều hòa",
+        "điều hoà",
+        "dieu hoa",
+      ];
+
+      for (const kw of keywordsMotorCos08) {
+        if (s.includes(kw)) {
+          return { cos: 0.8, load: "motor" };
+        }
+      }
+      return { cos: 1.0, load: null };
+    }
+
+    // Tìm công suất từ chuỗi
+    function detectPower(textLower, textRaw) {
+      let P = null;
+      let source = null;
+
+      // 1) Số + đơn vị W/kW
+      let m = textRaw.match(/(\d+(?:[.,]\d+)?)\s*(kw|kva|w|watt)/i);
+      if (m) {
+        let value = parseFloat(m[1].replace(",", "."));
+        const unit = m[2].toLowerCase();
+        if (unit.startsWith("kw") || unit === "kva") {
+          value = value * 1000;
+        }
+        P = value;
+        source = "unit";
+        return { P, source };
+      }
+
+      // 2) BTU -> W
+      let btu = textRaw.match(/(\d+(?:[.,]\d+)?)\s*btu/i);
+      if (btu) {
+        let value = parseFloat(btu[1].replace(",", "."));
+        P = value * 0.293;
+        source = "btu";
+        return { P, source };
+      }
+
+      // 3) Số trần -> W
+      let numOnly = textRaw.match(/(\d+(?:[.,]\d+)?)/);
+      if (numOnly) {
+        let value = parseFloat(numOnly[1].replace(",", "."));
+        P = value;
+        source = "plain-number";
+        return { P, source };
+      }
+
+      // 4) Dùng danh mục thiết bị
+      const defP = getDefaultPowerFromDevice(textLower);
+      if (defP != null) {
+        P = defP;
+        source = "device-default";
+        return { P, source };
+      }
+
+      return { P: null, source: null };
+    }
+
+    function getDefaultPowerFromDevice(textLower) {
+      for (const item of DEVICE_CATALOG) {
+        for (const kw of item.keywords) {
+          if (textLower.includes(kw)) {
+            return item.power;
+          }
+        }
+      }
+      return null;
+    }
+
+    // Phân tích câu chữ -> điền form + tự động thêm nhánh
     function parseNaturalText() {
       const raw = document.getElementById("nlInput").value.trim();
       if (!raw) {
@@ -229,90 +540,74 @@
         return;
       }
 
-      let text = raw.toLowerCase();
+      hideSuggestions(); // tắt popup khi đã nhập xong & bấm phân tích
 
-      // 1. Tìm công suất (W hoặc kW)
-      let power = null;
-      let powerMatch = text.match(/(\d+(?:[.,]\d+)?)\s*(kw|kW|kwatt|kWatt|w|watt)/i);
-      if (powerMatch) {
-        let value = parseFloat(powerMatch[1].replace(",", "."));
-        let unit = powerMatch[2].toLowerCase();
-        if (unit.startsWith("k")) {
-          value = value * 1000;
-        }
-        power = value;
-      }
+      const textLower = raw.toLowerCase();
 
-      // 2. Tìm cosphi chỉ cần chữ "cos"
-let cosphi = null;
+      // 1. Tìm công suất
+      const powerInfo = detectPower(textLower, raw);
+      const power = powerInfo.P;
+      const powerSource = powerInfo.source;
 
-// Mẫu linh hoạt:
-// cos 0.8
-// cos=0.8
-// cos0.8
-// cos:0.8
-// cos0,8
-let cosMatch = text.match(/cos\s*[:=]?\s*(\d+(?:[.,]\d+)?)/i);
+      // 2. Suy luận cosφ & loại tải
+      const inferred = inferCosAndLoadFromString(textLower);
+      let cosphi = inferred.cos;
+      let loadInfer = inferred.load;
 
-if (!cosMatch) {
-  // Trường hợp dạng "cos0.8" không có khoảng trắng
-  cosMatch = text.match(/cos(\d+(?:[.,]\d+)?)/i);
-}
-
-if (cosMatch) {
-  cosphi = parseFloat(cosMatch[1].replace(",", "."));
-}
-
-
-      // 3. Loại tải
-      let load = "no-motor";
-      if (
-        text.includes("động cơ") ||
-        text.includes("máy bơm") ||
-        text.includes("bơm nước") ||
-        text.includes("điều hòa") ||
-        text.includes("điều hoà") ||
-        text.includes("compressor")
-      ) {
-        load = "motor";
-      }
-
-      // 4. Vật liệu dây
+      // 3. Vật liệu dây
       let mat = "cu";
-      if (text.includes("nhôm")) {
+      if (textLower.includes("nhôm")) {
         mat = "al";
-      } else if (text.includes("đồng")) {
+      } else if (textLower.includes("đồng")) {
         mat = "cu";
       }
 
-      // 5. Tên nhánh: lấy phần trước giá trị công suất đầu tiên
+      // 4. Tên nhánh
       let name = "";
-      if (powerMatch) {
-        let idx = text.indexOf(powerMatch[0].toLowerCase());
+      let powerUnitMatch = raw.match(
+        /(\d+(?:[.,]\d+)?)\s*(kw|kva|w|watt|btu)/i
+      );
+      if (powerUnitMatch) {
+        let idx = raw.toLowerCase().indexOf(powerUnitMatch[0].toLowerCase());
         name = raw.slice(0, idx).trim();
+      } else {
+        name = raw;
       }
       if (!name) {
         name = "Nhánh " + (branches.length + 1);
       }
 
-      // Điền form (cho người dùng thấy đã phân tích ra gì)
+      // Điền form
       document.getElementById("b_name").value = name;
-      if (power) document.getElementById("b_power").value = power.toFixed(0);
-      if (cosphi) document.getElementById("b_cos").value = cosphi;
-      document.getElementById("b_load").value = load;
+      if (power) {
+        document.getElementById("b_power").value = power.toFixed(0);
+      }
       document.getElementById("b_mat").value = mat;
+      document.getElementById("b_cos_display").value = cosphi.toFixed(2);
+      document.getElementById("b_load").value =
+        loadInfer === "motor" ? "motor" : "no-motor";
 
-      // Auto-add nếu đủ name, P, cos
-      if (name && power && cosphi) {
-        addBranch(true); // tự động thêm nhánh
+      // Tự động thêm nhánh nếu có tên + P
+      if (name && power) {
+        addBranch(true, cosphi, loadInfer);
+
+        let note = "P ≈ " + power.toFixed(0) + " W";
+        if (powerSource === "btu") {
+          note += " (từ BTU quy đổi sang W, xấp xỉ)";
+        } else if (powerSource === "plain-number") {
+          note += " (số không có đơn vị, hiểu là W)";
+        } else if (powerSource === "device-default") {
+          note += " (mặc định theo loại thiết bị)";
+        }
+
         showStatus(
           "✅ Đã phân tích & tự động thêm nhánh: \"" +
             name +
-            "\" (P=" +
-            power.toFixed(0) +
-            " W, cosφ=" +
-            cosphi +
-            "). Nếu cần chỉnh sửa, bạn có thể sửa form rồi bấm “Thêm nhánh (thủ công)”."
+            "\" – " +
+            note +
+            ", cosφ = " +
+            cosphi.toFixed(2) +
+            "."
         );
       } else {
         showStatus(
@@ -321,35 +616,58 @@ if (cosMatch) {
       }
     }
 
-    // Thêm nhánh từ form; auto=true: gọi từ parseNaturalText (không alert to)
-    function addBranch(auto = false) {
+    // Thêm nhánh từ form; auto=true: gọi từ parseNaturalText
+    function addBranch(auto = false, cosOverride = null, loadOverride = null) {
       let n = document.getElementById("b_name").value.trim();
       let p = parseFloat(document.getElementById("b_power").value);
-      let c = parseFloat(document.getElementById("b_cos").value);
       let mat = document.getElementById("b_mat").value;
-      let load = document.getElementById("b_load").value;
+      let loadSelect = document.getElementById("b_load").value;
       let U = parseFloat(document.getElementById("b_voltage").value) || 220;
 
-      if (!n || !p || !c) {
+      if (!n || !p) {
         if (!auto) {
-          alert("Cần có đủ TÊN NHÁNH, P (W) và cosφ.");
+          alert("Cần có đủ TÊN NHÁNH và P (W).");
         }
         return;
       }
 
+      // Nếu không có cosOverride, suy luận lại từ tên nhánh
+      let inferred = inferCosAndLoadFromString(n);
+      let cosVal =
+        cosOverride != null
+          ? cosOverride
+          : inferred && inferred.cos
+          ? inferred.cos
+          : 1.0;
+
+      // Loại tải
+      let loadVal =
+        loadOverride || (inferred && inferred.load ? inferred.load : loadSelect);
+
+      document.getElementById("b_cos_display").value = cosVal.toFixed(2);
+      document.getElementById("b_load").value = loadVal;
+
       branches.push({
         name: n,
         P: p,
-        cos: c,
+        cos: cosVal,
         mat: mat,
-        load: load,
+        load: loadVal,
         U: U,
       });
 
       renderList();
 
       if (!auto) {
-        showStatus("✅ Đã thêm nhánh \"" + n + "\" từ form thủ công.");
+        showStatus(
+          '✅ Đã thêm nhánh "' +
+            n +
+            '" (P = ' +
+            p.toFixed(0) +
+            " W, cosφ = " +
+            cosVal.toFixed(2) +
+            ")."
+        );
       }
     }
 
@@ -367,7 +685,7 @@ if (cosMatch) {
         item.className = "branch-item";
         item.innerHTML =
           `<b>${b.name}</b><br>` +
-          `P = ${b.P} W, cosφ = ${b.cos}, U = ${b.U} V<br>` +
+          `P = ${b.P} W, cosφ = ${b.cos.toFixed(2)}, U = ${b.U} V<br>` +
           `${b.load === "motor" ? "Tải có động cơ" : "Tải không động cơ"} – ` +
           `${b.mat === "cu" ? "Dây đồng" : "Dây nhôm"}<br>` +
           `<button class="small danger" onclick="delBranch(${i})">Xoá nhánh</button>`;
@@ -418,7 +736,7 @@ if (cosMatch) {
         html +=
           `<div style="margin-bottom:8px;">` +
           `<b>${b.name}</b><br>` +
-          `P = ${b.P} W, cosφ = ${cos}, U = ${U} V → <b>I ≈ ${I.toFixed(
+          `P = ${b.P} W, cosφ = ${cos.toFixed(2)}, U = ${U} V → <b>I ≈ ${I.toFixed(
             2
           )} A</b><br>` +
           `Tiết diện yêu cầu S = I / J ≈ ${S.toFixed(
@@ -433,8 +751,8 @@ if (cosMatch) {
         totalI += I;
       });
 
-      // Mạch tổng (giả sử cùng điện áp 220V và dùng dây đồng tổng)
-      const J_tong = 6; // đồng
+      // Mạch tổng (giả sử dây tổng là dây đồng)
+      const J_tong = 6;
       const S_tong = totalI / J_tong;
       const Sstd_tong = chooseStd(S_tong);
       const MCB_tong = chooseMCB(totalI * 1.25);
@@ -454,7 +772,7 @@ if (cosMatch) {
     }
 
     function chooseStd(S) {
-      const std = [0.5, 0.75, 1, 1.5, 2, 2.5, 4, 6, 10, 16, 25, 35];
+      const std = [0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 6, 10];
       for (const x of std) {
         if (x >= S) return x;
       }
@@ -468,6 +786,11 @@ if (cosMatch) {
       }
       return list[list.length - 1];
     }
+
+    // Khi tải trang, bật hint
+    window.onload = () => {
+      handleInputHintAndSuggest();
+    };
   </script>
 </body>
 </html>
