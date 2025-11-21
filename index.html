@@ -243,12 +243,26 @@
         power = value;
       }
 
-      // 2. Tìm cosφ
-      let cosphi = null;
-      let cosMatch = text.match(/cos?|cos\s*=?\s*(\d+(?:[.,]\d+)?)/i);
-      if (cosMatch) {
-        cosphi = parseFloat(cosMatch[1].replace(",", "."));
-      }
+      // 2. Tìm cosphi chỉ cần chữ "cos"
+let cosphi = null;
+
+// Mẫu linh hoạt:
+// cos 0.8
+// cos=0.8
+// cos0.8
+// cos:0.8
+// cos0,8
+let cosMatch = text.match(/cos\s*[:=]?\s*(\d+(?:[.,]\d+)?)/i);
+
+if (!cosMatch) {
+  // Trường hợp dạng "cos0.8" không có khoảng trắng
+  cosMatch = text.match(/cos(\d+(?:[.,]\d+)?)/i);
+}
+
+if (cosMatch) {
+  cosphi = parseFloat(cosMatch[1].replace(",", "."));
+}
+
 
       // 3. Loại tải
       let load = "no-motor";
