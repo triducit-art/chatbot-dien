@@ -245,7 +245,7 @@
 
       // 2. Tìm cosφ
       let cosphi = null;
-      let cosMatch = text.match(/cosφ?|cos\s*=?\s*(\d+(?:[.,]\d+)?)/i);
+      let cosMatch = text.match(/cos?|cos\s*=?\s*(\d+(?:[.,]\d+)?)/i);
       if (cosMatch) {
         cosphi = parseFloat(cosMatch[1].replace(",", "."));
       }
