@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nhập liệu bằng chữ - Tính mạch điện nhiều nhánh</title>
+  <title>🔌ChatBot - Tính toán thông số mạch điện gia đình</title>
   <style>
     body {
       margin: 0;
@@ -226,7 +226,7 @@
         Quy ước tự động:<br />
         - Nếu mô tả có các từ:
         <b
-          >quạt trần, quạt đảo, quạt treo tường, máy bơm, động cơ, máy giặt, máy lạnh, điều hòa</b
+          >quạt trần, quạt đảo, quạt treo tường, máy bơm, động cơ, máy giặt, máy lạnh, điều hòa, máy lọc nước, máy xay sinh tố</b
         >
         ⇒ dùng <b>cosφ = 0,8</b> (tải có động cơ).<br />
         - Các trường hợp khác ⇒ <b>cosφ = 1</b>.<br />
@@ -356,9 +356,16 @@
       "điều hòa 9000 BTU",
       "bình nóng lạnh nhà tắm",
       "tủ lạnh 150W",
-      "ổ cắm tầng 1 1000W",
-      "dãy đèn led phòng khách 300W",
-      "bếp điện 1500W",
+      "đèn led 30W",
+      "đèn led 20W",
+	"đèn led 40W",
+	"đèn led 50W",
+	"đèn huỳnh quang 1m2 40W",
+	"đèn bàn 20W",
+	"đèn ngủ 10W",
+	"Lò vi sóng 850W",
+	"đèn huỳnh quang 60cm 20W",
+	"bếp điện 1500W",
       "máy giặt 500W",
     ];
 
@@ -462,8 +469,12 @@
         "máy lạnh",
         "may lanh",
         "điều hòa",
-        "điều hoà",
         "dieu hoa",
+	"Máy xay sinh tố",
+	"Máy lọc nước",
+	"máy rửa xe",
+	"máy sấy tóc",
+	"máy massage",
       ];
 
       for (const kw of keywordsMotorCos08) {
